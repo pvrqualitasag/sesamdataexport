@@ -1,0 +1,79 @@
+{
+"vvvo-farm-id":
+	"xxxx.xxxx.xxxx",
+"data-center":"LKV BW",
+"milkyield-testday":
+	[{
+	"animal-id":27608xxxxxxxxxx,
+	"testdate":"YYYYMMDD",
+	"milking-starttime":"YYYYMMDDTHH:MM:SS",
+	"DIM":xxx,
+	"Lact-no":xx,
+	"milkyield-testdate":xx,
+	"fat-perc-cow-testdate":x.xx,
+	"protein-perc-cow-testdate":x.xx,
+	"cellcount":xxxxxxxxx,
+	"lactosis":x.xx,
+	"urea":x.xx,
+	"fat-protein-ratio":x.xx
+	},{...}],
+"avg-milkyield-testday":
+	[{
+	"testdate":"YYYYMMDD",
+	"pattern-of-control":"vv",
+	"Parlor-system":"v",
+	"Ketosis-model":x,
+	"milking-starttime":"YYYYMMDDTHH:MM:SS",
+	"milkyield-herd-testdate":xxxx,xx,
+	"num-cows-milked-testdate":xxxxx,
+	"fat-perc-herd-testdate":xx.xx,
+	"protein-perc-herd-testdate":xx.xx,
+	"avg-cellcount-herd-testdate":xxxxxxxxx,
+	"lact-perc":xx.xx,
+	"avg-urea-herd-testdate":xx.xx
+	},{...}],
+"indication":
+	[{
+	"animal-id":27608xxxxxxxxxx,
+	"diagnosis":"vvv",
+	"date":"YYYYMMDD",
+	"intervening-person":"vvv"
+	},{...}],
+"calving":
+	[{
+	"animal-id":27608xxxxxxxxxx,
+	"calving-date":"YYYYMMDD",
+	"calving-ease":x,
+	"sex":"v",
+	"ageatcalving":xx
+	},{...}],
+"insemination":
+	[{
+	"animal-id":27608xxxxxxxxxx,
+	"insemination-date":"YYYYMMDD",
+	"preg-check-method":"vv",
+	"preg-check-date":"YYYYMMDD",
+	"preg-check-result":"vv",
+	"heat-observation":"YYYYMMDD",
+	"heat-obs-method":xx,
+	"insemination-number":xxx,
+	"insemination-age":xxxx,
+	"rastzeit":xxxx,
+	"guestzeit":xxxx,
+	"days-between-calving":xxxx,
+	"insemination-index":xx.xx
+	},{...}],
+"master-data-cattle":
+	[{
+	"animal-id":27608xxxxxxxxxx,
+	"name":"vvvvvvvvvvvvvvv",
+	"num-of-shed":xxxxxxxxxxxxxxx,
+	"test-number":xxxxxx,
+	"birthday":"YYYYMMDD",
+	"breed":"vvv",
+	"sex":"v",
+	"animal-id-father":27608xxxxxxxxxx,
+	"animal-id-mother":27608xxxxxxxxxx,
+	"date-of-removingfromstable":"YYYYMMDD",
+	"reason-of-leaving":"v"
+	}, {...}]

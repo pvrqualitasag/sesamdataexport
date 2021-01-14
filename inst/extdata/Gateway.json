@@ -1,0 +1,15 @@
+{
+"vvvo-farm-id":"xxxx.xxxx.xxxx",
+"data-center":"LKV BW",
+"recordID":xxxxxxx,
+"animals":
+	[
+		{"sensor-id":"vvvvvvvvvv",
+		"timestamp":"YYYYMMDDTHH:MM:SS",
+		"rumination":1,
+		"lying":1,
+		"standing":0,
+		"walking":0,
+		"feeding":0}, {...}
+	]
+	}

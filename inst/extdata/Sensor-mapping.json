@@ -1,0 +1,14 @@
+{
+"vvvo-farm-id":
+	"xxxx.xxxx.xxxx",
+"data-center":
+	”LKV BW”,
+"sensor-mapping":
+	[
+		{
+			"animal-id": 27608xxxxxxxxxxx,
+			"sensor-id": "vvvvvvvvvv",
+			"datetime": "YYYYMMDDTHH:MM:SS"
+		}, ...
+	]
+}

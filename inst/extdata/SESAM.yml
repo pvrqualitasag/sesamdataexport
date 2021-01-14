@@ -1,0 +1,417 @@
+openapi: 3.0.1
+info:
+  title: SESAM API
+  contact:
+    name: XXX
+    url: 'http://'
+    email: yyy@zzz.at
+  version: 1.0.0
+servers:
+  - url: 'http://127.0.0.1:8080/sesam-api'
+    description: SESAM Testserver
+
+paths:
+  /login:
+    post:
+      tags:
+        - Login
+      description: 'Login eines Users, gibt JWT zurueck'
+      operationId: login
+      requestBody:
+        description: Logindaten
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Login'
+      responses:
+        '200':
+          description: JWT
+          content:
+            text/plain:
+              schema:
+                type: string
+        '401':
+          description: 'Userdaten fehlerhaft'
+
+
+
+components:
+  schemas:
+    ApiError:
+      properties:
+        message:
+          type: string
+        description:
+          type: string
+
+    Login:
+      required:
+          - username
+          - password
+
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+
+
+    Activity:
+      required:
+        - activity
+        - active
+
+      properties:
+        activity:
+          type: string
+        active:
+          description: Hier eventuell direkt `string` verwenden, um zukunftssicher zu sein? Dann würde ich das Feld jedoch auch eher `status` nennen
+
+          type: integer
+          format: int32
+
+    Sensor:
+      required:
+        - sensor-id
+        - timestamp
+
+      properties:
+        sensor-id:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+
+        activities:
+          description: Wird es auch Sensor-Daten ohne Activity geben? z.B. eine Art "Lebenszeichen" des Sensors; Also required Ja/Nein
+          # Nein, aber die Sensor-Daten enthalten jedes Mal den aktuellen,
+          # übermittelten Batteriestand des jeweiligen Sensors
+          type: array
+          items:
+            $ref: '#/components/schemas/Activity'
+#        hardware-revision:
+#          type: string
+#        software-revision:
+#          type: string
+#        battery-status:
+#          type: number
+#          format: float
+
+
+    Gateway:
+      allOf:
+        - $ref: '#/components/schemas/Header'
+        - type: object
+
+          required:
+            - recordID
+            - sensors
+
+          properties:
+            recordID:
+              description: Ist das ein Hash- oder ein DB-Sequence-Wert? Dementsprechend String vs Long?
+              type: string
+            sensors:
+              type: array
+              items:
+                $ref: '#/components/schemas/Sensor'
+
+
+    Milkyield-Testday:
+      required:
+        - animal-id
+
+      properties:
+        animal-id:
+          type: integer
+          format: int64
+
+        testdate:
+          type: string
+          format: date
+        milking-starttime:
+          type: string
+          format: date-time
+        DIM:
+          type: integer
+          format: int32
+        Lact-no:
+          type: integer
+          format: int32
+        milkyield-testdate:
+          type: number
+          format: float
+        fat-perc-cow-testdate:
+          type: number
+          format: float
+        protein-perc-cow-testdate:
+          type: number
+          format: float
+        cellcount:
+          description: Macht es hier nicht mehr Sinn in Einheiten von 1000 zu arbeiten?
+          # ja
+          type: integer
+          format: int64
+        lactosis:
+          type: number
+          format: float
+        urea:
+          type: number
+          format: float
+        fat-protein-ratio:
+          type: number
+          format: float
+
+    Avg-Milkyield-Testday:
+      properties:
+        testdate:
+          type: string
+          format: date
+        pattern-of-control:
+          type: string
+        Parlor-system:
+          type: string
+        Ketosis-model:
+          type: integer
+          format: int32
+        milking-starttime:
+          type: string
+          format: date-time
+        milkyield-herd-testdate:
+          type: number
+          format: float
+        num-cows-milked-testdate:
+          type: integer
+          format: int32
+        fat-perc-herd-testdate:
+          type: number
+          format: float
+        protein-perc-herd-testdate:
+          type: number
+          format: float
+        avg-cellcount-herd-testdate:
+          type: integer
+          format: int64
+        lact-perc:
+          type: number
+          format: float
+        avg-urea-herd-testdate:
+          type: number
+          format: float
+
+    Indication:
+      required:
+        - animal-id
+
+      properties:
+        animal-id:
+          type: integer
+          format: int64
+
+        diagnosis:
+          type: string
+        date:
+          type: string
+          format: date
+        intervening-person:
+          type: string
+
+    Calving:
+      required:
+        - animal-id
+        - calving-date
+
+      properties:
+        animal-id:
+          type: integer
+          format: int64
+
+        calving-date:
+          type: string
+          format: date
+        calving-ease:
+          type: integer
+          format: int32
+        sex:
+          type: string
+        ageatcalving:
+          type: integer
+          format: int32
+#        multiple:
+#          description: War in Vorlage json nicht enthalten
+#          # sollte aber eingefügt werden, war mein Fehler
+#          type: integer
+#          format: int32
+
+    Insemination:
+      required:
+        - animal-id
+
+      properties:
+        animal-id:
+          type: integer
+          format: int64
+
+        insemination-date:
+          type: string
+          format: date
+        preg-check-method:
+          description: 'Wirklick P/N? sollte man nicht einheitlich auf true/false gehen?'
+          type: string
+        preg-check-date:
+          type: string
+          format: date
+        preg-check-result:
+          type: string
+        heat-observation:
+          description: vielleicht `heat-observation-date`?
+          type: string
+          format: date
+        heat-obs-method:
+          type: integer
+          format: int32
+        insemination-number:
+          type: integer
+          format: int32
+        insemination-age:
+          type: integer
+          format: int32
+        rastzeit:
+          type: integer
+          format: int32
+        guestzeit:
+          type: integer
+          format: int32
+        days-between-calving:
+          type: integer
+          format: int32
+        insemination-index:
+          type: number
+          format: float
+
+    Master-Data-Cattle:
+      required:
+        - animal-id
+
+      properties:
+        animal-id:
+          type: integer
+          format: int64
+
+        name:
+          type: string
+        num-of-shed:
+          type: integer
+          format: int64
+        test-number:
+          type: integer
+          format: int64
+        birthday:
+          type: string
+          format: date
+        breed:
+          type: string
+        sex:
+          type: string
+        animal-id-father:
+          description: genügt hier nicht auch einfach nur father?
+          type: integer
+          format: int64
+        animal-id-mother:
+          description: genügt hier nicht auch einfach nur mother?
+          type: integer
+          format: int64
+        date-of-temovingfromstable:
+          type: string
+          format: date
+        reason-of-leaving:
+          type: string
+
+
+
+    Partner:
+      allOf:
+        - $ref: '#/components/schemas/Header'
+
+        - type: object
+          properties:
+            milkyield-testdays:
+              type: array
+              items:
+                $ref: '#/components/schemas/Milkyield-Testday'
+            avg-milkyield-testdays:
+              type: array
+              items:
+                $ref: '#/components/schemas/Avg-Milkyield-Testday'
+            indications:
+              type: array
+              items:
+                $ref: '#/components/schemas/Indication'
+            calvings:
+              type: array
+              items:
+                $ref: '#/components/schemas/Calving'
+            inseminations:
+              type: array
+              items:
+                $ref: '#/components/schemas/Insemination'
+            master-data-cattles:
+              type: array
+              items:
+                $ref: '#/components/schemas/Master-Data-Cattle'
+
+
+    Mapping:
+      required:
+        - animal-id
+        - sensor-id
+        - datetime
+
+      properties:
+        animal-id:
+          type: integer
+          format: int64
+        sensor-id:
+          type: integer
+          format: int64
+        datetime:
+          type: string
+          format: date-time
+
+    Sensor-Mapping:
+      allOf:
+        - $ref: '#/components/schemas/Header'
+
+        - type: object
+          required:
+            - mappings
+
+          properties:
+            mappings:
+              type: array
+              items:
+                $ref: '#/components/schemas/Mapping'
+
+
+
+    Header:
+      required:
+        - farm-id
+        - data-center
+
+      properties:
+        farm-id:
+          description: 'laut Def: int64??'
+          # Ja, aber wir "missbrauchen" den data-center tag, um damit den Partner zu kodieren,
+          # strings wären da sinnvoller
+          type: string
+        data-center:
+          type: string
+
+
+
+  securitySchemes:
+    jwt:
+      type: http
+      scheme: bearer

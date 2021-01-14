@@ -1,0 +1,22 @@
+---
+title: "Tests zum SESAM Dataexport"
+author: "Peter von Rohr"
+date: "1/5/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Erklärung
+Die Tests auf der Datenbank zum Datenexport für SESAM sind hier protokolliert.
+
+
+## Voraussetzung
+Die Tests werden mit dem Datenbank-Client `sql` von der Kommandozeile aus gemacht. Die Installation von `sql` ist unter https://qualitasag.atlassian.net/wiki/spaces/ZWS/pages/466681877/SQL-Entwicklung+auf+Argus+von+unseren+Macs+aus dokumentiert. Mit der entsprechenden `tnsnames.ora`-Konfigurationsdatei, welche im Homeverzeichnis abgelegt werden muss, kann mit dem folgenden Befehl eine Verbindung zur Datenbank aufgebaut werden.
+
+```
+sql gestho/gestho@ARGUS
+```
+

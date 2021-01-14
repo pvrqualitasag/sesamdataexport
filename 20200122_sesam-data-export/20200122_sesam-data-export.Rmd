@@ -1,0 +1,151 @@
+---
+title: "SESAM Data Export"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::knit_hooks$set(hook_convert_odg = rmdhelp::hook_convert_odg)
+```
+
+# Disclaimer
+First Steps of getting started with exporting farm data and animal data from the breeding organisation database to be delivered to the SESAM server is described in this document. 
+
+
+```{r sesam-skel-fn, echo=FALSE}
+s_sesam_fn <- "Partner.json"
+s_sesam_data_export <- file.path(here::here(), "inst", "extdata", s_sesam_fn)
+```
+
+# Resources and Material
+The avaiable resources consist of template JSON files provided by Thomas Rahimi. From the provided JSON files, only the file called `r s_sesam_fn` is important for the dataexport.
+
+
+# Inspect JSON File
+To get a better understanding, the json file is read. 
+
+```{r sesam-json-read, eval=FALSE}
+s_sesam_data_export <- file.path(here::here(), "inst", "extdata", "Partner.json")
+require(RJSONIO)
+l_sesam <- fromJSON(s_sesam_data_export)
+```
+
+Unfortunately, the file contains certain placeholders and it does therefore not represent a valid JSON object. Therefore it cannot be read using the `RJSONIO` package. Reading it as a normal file and inspecting the header of the file leads to
+
+```{r sesam-skel-txt-read}
+con_sesam <- file(description = s_sesam_data_export)
+vec_sesam_data_export_skeleton <- readLines(con = con_sesam)
+close(con = con_sesam)
+head(vec_sesam_data_export_skeleton)
+```
+
+
+# Data Export - Mode of Operation
+When SESAM moves into a testing- or a production-phase, farmers must be able to contact their breeding organisation (BO) to have their farm activated for the SESAM service. The activation of a farm should be available via the Webapplication of the BO. An example of how this might look like is shown in the diagram below.
+
+```{r sesam-activation, echo=FALSE, hook_convert_odg=TRUE, fig_path="odg"}
+#rmdhelp::use_odg_graphic(ps_path = "odg/sesam-activation.odg")
+knitr::include_graphics(path = "odg/sesam-activation.png")
+```
+
+
+This activation requires certain data to be transfered from the BO-database to the SESAM server. This data-transfer is initially prepared by the SESAM-project team, but for the larger testing- or production phase, this data-tranfer must be implemented by the IT-group of Qualitas AG. As a consequence of this mode of operation, the data export functionality must be implemented in a PL/SQL-package that runs on the database. The package is called `pa_sesam`. 
+
+
+# Package Design
+The package has one main entry point consisting of a public procedure called `SesamDataExport`. This procedure takes the farm-ID as parameter argument. The farm-ID is the primary key of the farm and it is also available from the web-application as it is shown on the farm-view. This will make it possible to trigger the data-transfer for the BO from the web-application. In production mode the functionality in `pa_sesam` will just collect the data from the farm and will send them to the sesam-server. Most likely, it will also be benefitial to write the data to be sent to a file such that it can be verified what was sent. On top of that, the package should have a debugging mode where more information is written to a logfile.
+
+
+# Preparation
+According to the structure given in `r s_sesam_fn`, the data to be transfered is divided into the following sections.
+
+1. milkyield-testday
+2. avg-milkyield-testday
+3. indication
+4. calving
+5. insemination
+6. master-data-cattle
+
+The result of the data-export is one JSON object which is specific for one farm. We can say this because the farm-ID appears as a top-level record entry and hence all sub-records must relate to that single farm.
+
+## Milkyield-testday
+Milk performance characteristics for each cow on each testday are collected. Hence for each cow-testday combination we will obtain one record. 
+
+
+## Avg-milkyield-testday
+This corresponds to the first data-records but averaged across all cows for every testday.
+
+
+## Indication
+Records about health-related indiciations
+
+
+## Calving
+Data on calving events
+
+
+## Insemination
+Data on insemination events. The problem with the insemination data is that there is more than one record per animal. Hence, when going through the list of animals we get a table of records which must be matched into a JSON-Array of single insemination records. Due to our database model, there is no secure way to link pregnancy testing and insemination records. There is a question on what level the insemination index must be computed. Should this be on a cow level or on a farm level. It probably makes most sense to show this at the cow level up until the current insemination event.
+
+
+## Master-data-cattle
+Master data on each cow. The components of the export of `master-data-cattle` are listed in the following table. 
+
+```{r tbl-mdc-table, echo=FALSE}
+tbl_mdc_fields <- tibble::tibble(`JSON-Keys` = c("animal-id", 
+                                                 "name", 
+                                                 "num-of-shed",
+                                                 "test-number", 
+                                                 "birthday", 
+                                                 "breed", 
+                                                 "sex", 
+                                                 "animal-id-father", 
+                                                 "animal-id-mother", 
+                                                 "date-of-removingfromstable",
+                                                 "reason-of-leaving"),
+                                 `DB-Field` = c("pa_ani.sTvdNrDataExport(pnaniid",
+                                                "ANINOM",
+                                                "???",
+                                                "???",
+                                                "ANIDATENAISSANCE",
+                                                "ANI_RACE_ID",
+                                                "ANISEX",
+                                                "IDPERE",
+                                                "IDMERE",
+                                                "ANI_TVDABGANGSDATUM",
+                                                "ANI_TVDABGANG_ID"))
+knitr::kable(tbl_mdc_fields)
+```
+
+
+
+# Property Overview over all Exports 
+```{r tbl-mdc-prop-table, echo=FALSE}
+tbl_mdc_prop <- tibble::tibble(Part = c("milkyield-testday",
+                                        "avg-milkyield-testday",
+                                        "indication",
+                                        "calving",
+                                        "insemination",
+                                        "master-data-cattle"),
+                          Table = c("PESEE",
+                                    "",
+                                    "TR_MEDIDIAG",
+                                    "LACTATION",
+                                    "INSEMINATION",
+                                    "ANIMAL"),
+                          `Primary Key` = c("IDPESEE",
+                                            "",
+                                            "MEDD_ID",
+                                            "IDLACTATION",
+                                            "IDINSEMINATION",
+                                            "IDANIMAL"))
+knitr::kable(tbl_mdc_prop)
+```
+
+
+
+
+
+
+ 
